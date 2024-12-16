@@ -19,6 +19,13 @@ export class UMDLoader extends Component {
     this.loadResources();
   }
 
+  componentDidUpdate(prevProps) {
+    // 检查 jsCdnAddress 是否变化
+    if (prevProps.jsCdnAddress !== this.props.jsCdnAddress) {
+      this.loadResources(); // 重新加载资源
+    }
+  }
+
   get resourceUrls() {
     const { jsCdnAddress = [], cssCdnAddress = [] } = this.props;
     const jsUrls = typeof jsCdnAddress === 'string' ? [jsCdnAddress] : jsCdnAddress;
@@ -35,7 +42,7 @@ export class UMDLoader extends Component {
       return;
     }
     const promises = [];
-    
+
     // 加载 npm 包
     npmPackages.forEach((pkg) => {
       promises.push(import(pkg)); // 使用动态 import 加载 npm 包
