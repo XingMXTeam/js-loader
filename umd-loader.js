@@ -15,6 +15,9 @@ export class UMDLoader extends Component {
     scriptState: PromiseState.loading,
   };
 
+  // 缓存已加载的资源
+  loadedResources = new Set();
+
   componentDidMount() {
     this.loadResources();
   }
@@ -50,6 +53,13 @@ export class UMDLoader extends Component {
 
     // 加载外部资源
     resourceUrls.forEach(({ url, type }) => {
+      // 检查是否已经加载过该资源
+      if (this.loadedResources.has(url)) {
+        promises.push(Promise.resolve()); // 如果已加载，返回已解决的 Promise
+      }
+
+      // 如果未加载，添加到缓存并加载资源
+      this.loadedResources.add(url);
       const loadFn = type === 'CSS' ? loadStyle : loadScript;
       promises.push(loadFn(url));
     });
